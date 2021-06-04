@@ -6,35 +6,14 @@
           <h4 style="color:white">Hot Manga</h4>
 
           <div class="latest">
-            <!-- <div class="skeleton" v-if="loading">
-              <div v-for="n in 7" :key="n + 's'">
-                <vue-skeleton-loader
-                  color="rgb(219, 219, 219)"
-                  wave-color="rgb(247, 247, 247)"
-                  :rounded="true"
-                  :width="200"
-                  :height="280"
-                />
-                <div style="margin-top:10px;">
-                  <vue-skeleton-loader
-                    color="rgb(219, 219, 219)"
-                    wave-color="rgb(247, 247, 247)"
-                    :rounded="true"
-                    :width="180"
-                    :height="20"
-                  />
-                </div>
-                <div style="margin-top:10px;">
-                  <vue-skeleton-loader
-                    color="rgb(219, 219, 219)"
-                    wave-color="rgb(247, 247, 247)"
-                    :rounded="true"
-                    :width="80"
-                    :height="20"
-                  />
-                </div>
-              </div>
-            </div> -->
+            <div v-if="loading" style="display:flex">
+              <div v-for="n in 8" :key="n+'sk'" >
+								<div class="manga">
+									<skeleton :width="200" :height="250" />
+								</div>
+								
+							</div>
+            </div>
             <div
               class="manga manga-slide col-md-6"
               v-for="(manga, i) in mangaTop"
@@ -46,13 +25,11 @@
                   selector: 'img'
                 }"
               >
-             
                 <img
                   :data-src="manga.thumbnail"
                   class="manga-image rounded card-img-top"
                   :data-error="require('../assets/blank.png')"
                 />
-            
               </div>
               <div class="manga-body" style="width:12.5em;">
                 <h5
@@ -65,7 +42,7 @@
               </div>
             </div>
           </div>
-          <div class="scroll">
+          <div class="scroll"  v-if="!loading">
             <div class="scroll-left">
               <div @click="scrollLeft" class="button-scroll">
                 <img class="arrow" src="../assets/svg/arrow-left.svg" alt="" />
@@ -88,16 +65,29 @@
             <div class="col-md-10">
               <h4 style="color:#383838">Latest Update</h4>
             </div>
-            <div class="col-md-2" @click="() => {
-              router.push('/latest/all')
-              }">
+						
+            <div
+              class="col-md-2"
+              @click="
+                () => {
+                  router.push('/latest/all');
+                }
+              "
+            >
               <h4 class="view-more">View More</h4>
             </div>
           </div>
 
           <div class="latests" style="margin-bottom:20px;">
-            
             <div class="row">
+							<div v-if="loading" style="display:flex">
+								<div v-for="n in 4" :key="n+'sk'" >
+								<div class="manga col-md-3">
+									<skeleton :width="200" :height="250" />
+								</div>
+								
+							</div>
+						</div>
               <div
                 class="col-sm-3"
                 v-for="(manga, i) in mangas"
@@ -112,9 +102,7 @@
                   <img
                     :data-src="manga.thumbnail"
                     class="manga-image rounded card-img-top"
-                    :data-error="
-                      require('../assets/blank.png')
-                    "
+                    :data-error="require('../assets/blank.png')"
                     :data-loading="
                       require('../assets/svg/Interwind-1s-200px.svg')
                     "
@@ -133,9 +121,8 @@
             </div>
             <div class="row" v-if="!loading">
               <div class="d-grid gap-2 col-6 mx-auto">
-               <button class="btn-outline">View More</button>   
+                <button class="btn-outline">View More</button>
               </div>
-             
             </div>
           </div>
         </div>
@@ -143,6 +130,11 @@
       <div class="genre col-md-3 sticky-top" style="height:100vh">
         <div class="container">
           <h4 style="color:#383838">Genre</h4>
+					<div v-if="loading" >
+							<div v-for="n in 5" :key="n+'g'" style="margin:5px">
+								<skeleton :width="100" :height="30"/>
+							</div>
+					</div>
           <div v-if="!loading">
             <div class="genre-item">
               <span
@@ -155,7 +147,6 @@
               >
             </div>
           </div>
-          
         </div>
       </div>
     </div>
@@ -165,7 +156,10 @@
 import axios from "axios";
 import router from "../router";
 import genre from "../utils/genre";
+import Skeleton from "../components/Skeleton";
 
+const hotUrl = "https://warm-refuge-03594.herokuapp.com/api/manga/top";
+const latestUrl = "https://warm-refuge-03594.herokuapp.com/api/manga/latest";
 function sideScroll(element, direction, speed, distance, step) {
   var scrollAmount = 0;
 
@@ -186,18 +180,20 @@ function sideScroll(element, direction, speed, distance, step) {
 function replace(val) {
   let slug = val;
   slug = slug.replace(/\s/g, "-");
-  return slug
+  return slug;
 }
 
 function getLink(val) {
   let link = val.link;
   let res = link.split("/");
   res = res[res.length - 1];
-  return res
+  return res;
 }
 export default {
   name: "app",
-
+  components: {
+    Skeleton
+  },
   data() {
     return {
       loading: false,
@@ -205,35 +201,38 @@ export default {
       mangaTop: [],
       router: router,
       genre: genre,
-      keyword: "",
-      hotUrl: "https://warm-refuge-03594.herokuapp.com/api/manga/top",
-      latestUrl: "https://warm-refuge-03594.herokuapp.com/api/manga/latest"
+      keyword: ""
     };
   },
   created() {
     this.request();
+    const elem = document.querySelector(".latest");
+    console.log(elem.scrollLeft);
+    if (elem.scroll === null) {
+      document.querySelector(".scroll-left").style.visibility = "hidden";
+    }
   },
   methods: {
     selectGenre(g) {
-      const slug = replace(g)
+      const slug = replace(g);
       router.push("/genre/" + slug);
     },
     scrollLeft() {
       const elem = document.querySelector(".latest");
 
-      sideScroll(elem, "left", 20, 500, 20);
+      sideScroll(elem, "left", 20, 500, window.innerWidth - 400);
     },
     scrollRight() {
       const elem = document.querySelector(".latest");
-      sideScroll(elem, "right", 20, 500, 20);
+      sideScroll(elem, "right", 20, 500, window.innerWidth - 400);
     },
     displayManga(manga) {
-      const res = getLink(manga)
+      const res = getLink(manga);
       router.push("/manga/" + res);
     },
     request() {
-      const requestOne = axios.get(this.hotUrl);
-      const requestTwo = axios.get(this.latestUrl);
+      const requestOne = axios.get(hotUrl);
+      const requestTwo = axios.get(latestUrl);
       this.loading = true;
       axios.all([requestOne, requestTwo]).then(
         axios.spread((...responses) => {
@@ -264,13 +263,11 @@ export default {
     width: 10rem;
     transition: ease-in-out 0.5s;
     margin-right: 10px;
-
   }
   img {
     width: 100px;
     height: 250px;
     transition: ease-in-out 0.5s;
-    
   }
   .manga-slide {
     margin-right: 10px;
@@ -292,14 +289,13 @@ export default {
 }
 
 .btn-outline {
-  
-  background-color:white;
-  color:#919191;
+  background-color: white;
+  color: #919191;
   border-style: solid;
   font-weight: 800;
   border-color: #bb25e8;
   border-radius: 5px;
-  padding:5px;
+  padding: 5px;
 }
 .btn-outline:hover {
   background-color: #bb25e8;
@@ -361,12 +357,12 @@ span {
 }
 span:hover {
   color: #bb25e8;
-  background-color:white;
+  background-color: white;
   top: -5px;
 }
 .skeleton {
   display: flex;
-  overflow-x: hidden; 
+  overflow-x: hidden;
 }
 .loader {
   margin: 15px;
@@ -382,10 +378,9 @@ span:hover {
   display: flex;
   overflow-x: auto;
   scroll-behavior: smooth;
-  
 }
 .view-more {
-  color:#383838;
+  color: #383838;
 
   transition: ease-in-out 0.5s;
 }
@@ -393,9 +388,9 @@ span:hover {
   text-decoration: underline;
   cursor: pointer;
   color: #bb25e8;
-  transform: translate(11px,0px);
--webkit-transform: translate(11px,0px);
--moz-transform: translate(11px,0px);
+  transform: translate(11px, 0px);
+  -webkit-transform: translate(11px, 0px);
+  -moz-transform: translate(11px, 0px);
 }
 .latest-title {
   color: #666666;
@@ -405,6 +400,7 @@ span:hover {
   height: 5px;
   background-color: #f5f5f5;
   border-radius: 10px;
+	display:none;
 }
 .latest::-webkit-scrollbar-track {
   -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
@@ -433,9 +429,9 @@ span:hover {
   width: 200px;
   height: 250px;
   transition: ease-in-out 0.5s;
-  box-shadow: 1px 4px 7px 0px rgba(0,0,0,0.71);
--webkit-box-shadow: 1px 4px 7px 0px rgba(0,0,0,0.71);
--moz-box-shadow: 1px 4px 7px 0px rgba(0,0,0,0.71);
+  box-shadow: 1px 4px 7px 0px rgba(0, 0, 0, 0.71);
+  -webkit-box-shadow: 1px 4px 7px 0px rgba(0, 0, 0, 0.71);
+  -moz-box-shadow: 1px 4px 7px 0px rgba(0, 0, 0, 0.71);
 }
 .manga-image:hover {
   cursor: pointer;

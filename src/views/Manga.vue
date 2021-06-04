@@ -5,7 +5,9 @@
         <div class="row pt-5">
           <div class="col-md-2">
             <div class="mx-auto">
-              
+              <div v-if="loading">
+                <skeleton :width="260" :height="350" />
+              </div>
               <div
                 v-lazy-container="{
                   selector: 'img'
@@ -28,7 +30,17 @@
             </div>
           </div>
           <div class="info col-md-6 mt-1 mx-auto">
-            
+            <div v-if="loading" class="skeleton">
+              <div class="text-skeleton">
+                <skeleton :width="300" :height="30" />
+              </div>
+              <div class="text-skeleton">
+                <skeleton :width="250" :height="25" />
+              </div>
+              <div class="text-skeleton">
+                <skeleton :width="230" :height="25" />
+              </div>
+            </div>
             <div v-if="!loading" class="info">
               <h2>{{ mangaInfo.title }}</h2>
               <h5 style="line-height:2em;height:2em;overflow:hidden;">
@@ -48,7 +60,6 @@
         </div>
         <div class="row mt-4">
           <div class="col">
-            
             <p class="desc" v-if="!loading" style="color:#707070">
               {{ mangaInfo.description }}
             </p>
@@ -77,10 +88,12 @@
 </template>
 <script>
 import axios from "axios";
+import Skeleton from "../components/Skeleton.vue";
 import router from "../router";
 
 export default {
   name: "Manga",
+  components: { Skeleton },
   data() {
     return {
       url: "https://warm-refuge-03594.herokuapp.com/api/manga/",
@@ -148,7 +161,7 @@ export default {
     color: white !important;
   }
   .info {
-    margin-top:20px;
+    margin-top: 20px;
   }
   .image {
     text-align: center !important;
@@ -199,5 +212,8 @@ img {
 }
 tr:hover {
   cursor: pointer;
+}
+.text-skeleton {
+	margin-bottom:5px;
 }
 </style>
