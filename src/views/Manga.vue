@@ -91,12 +91,14 @@ import axios from "axios";
 import Skeleton from "../components/Skeleton.vue";
 import router from "../router";
 
+const url = "https://warm-refuge-03594.herokuapp.com/api/manga/";
+
 export default {
   name: "Manga",
   components: { Skeleton },
   data() {
     return {
-      url: "https://warm-refuge-03594.herokuapp.com/api/manga/",
+    
       mangaInfo: [],
       loading: false
     };
@@ -106,7 +108,7 @@ export default {
       const slug = router.currentRoute.params.slug;
       this.loading = true;
       axios
-        .get(this.url + slug)
+        .get(`${url}${slug}`)
         .then(resp => {
           this.mangaInfo = resp.data;
         })
@@ -119,15 +121,19 @@ export default {
     },
     displayChapter(e) {
       const link = e.link;
-      let chapter = link.split("/");
-      let chapterNumber = chapter[chapter.length - 1];
+      const chapter = link.split("/");
+      const chapterNumber = chapter[chapter.length - 1];
+			const mangaInfo = this.mangaInfo.chapters[0].link;
+			const splitLink = mangaInfo.split("/");
+			const lastChapter = splitLink[splitLink.length - 1];
       router.push({
         name: "Chapter",
         params: {
           chapter: chapterNumber,
           link: this.mangaInfo.chapters,
-          mangaTitle: this.mangaInfo.title
-        }
+          mangaTitle: this.mangaInfo.title,
+					lastChapter: lastChapter,
+        },
       });
     }
   },

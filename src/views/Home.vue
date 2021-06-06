@@ -1,18 +1,19 @@
 <template>
   <div class="mx-auto">
     <div class="body">
-      <div style="position:relative" class="row container mx-auto">
+      <div style="position:relative" class="row mx-auto">
         <div class="hot">
-          <h4 style="color:white">Hot Manga</h4>
+          <div class="container">
+            <h4 style="color:white">Hot Manga</h4>
+          </div>
 
           <div class="latest">
             <div v-if="loading" style="display:flex">
-              <div v-for="n in 8" :key="n+'sk'" >
-								<div class="manga">
-									<skeleton :width="200" :height="250" />
-								</div>
-								
-							</div>
+              <div v-for="n in 8" :key="n + 'sk'">
+                <div class="manga">
+                  <skeleton :width="200" :height="250" />
+                </div>
+              </div>
             </div>
             <div
               class="manga manga-slide col-md-6"
@@ -42,7 +43,7 @@
               </div>
             </div>
           </div>
-          <div class="scroll"  v-if="!loading">
+          <div class="scroll" v-if="!loading">
             <div class="scroll-left">
               <div @click="scrollLeft" class="button-scroll">
                 <img class="arrow" src="../assets/svg/arrow-left.svg" alt="" />
@@ -65,7 +66,7 @@
             <div class="col-md-10">
               <h4 style="color:#383838">Latest Update</h4>
             </div>
-						
+
             <div
               class="col-md-2"
               @click="
@@ -80,14 +81,13 @@
 
           <div class="latests" style="margin-bottom:20px;">
             <div class="row">
-							<div v-if="loading" style="display:flex">
-								<div v-for="n in 4" :key="n+'sk'" >
-								<div class="manga col-md-3">
-									<skeleton :width="200" :height="250" />
-								</div>
-								
-							</div>
-						</div>
+              <div v-if="loading" style="display:flex">
+                <div v-for="n in 4" :key="n + 'sk'">
+                  <div class="manga col-md-3">
+                    <skeleton :width="200" :height="250" />
+                  </div>
+                </div>
+              </div>
               <div
                 class="col-sm-3"
                 v-for="(manga, i) in mangas"
@@ -130,11 +130,11 @@
       <div class="genre col-md-3 sticky-top" style="height:100vh">
         <div class="container">
           <h4 style="color:#383838">Genre</h4>
-					<div v-if="loading" >
-							<div v-for="n in 5" :key="n+'g'" style="margin:5px">
-								<skeleton :width="100" :height="30"/>
-							</div>
-					</div>
+          <div v-if="loading">
+            <div v-for="n in 5" :key="n + 'g'" style="margin:5px">
+              <skeleton :width="100" :height="30" />
+            </div>
+          </div>
           <div v-if="!loading">
             <div class="genre-item">
               <span
@@ -157,38 +157,16 @@ import axios from "axios";
 import router from "../router";
 import genre from "../utils/genre";
 import Skeleton from "../components/Skeleton";
+import {
+	sideScroll, 
+	replace, 
+	getLink, 
+	getScrollHeight
+} from '../utils/helper';
 
 const hotUrl = "https://warm-refuge-03594.herokuapp.com/api/manga/top";
 const latestUrl = "https://warm-refuge-03594.herokuapp.com/api/manga/latest";
-function sideScroll(element, direction, speed, distance, step) {
-  var scrollAmount = 0;
 
-  var slideTimer = setInterval(function() {
-    if (direction == "left") {
-      element.scrollLeft -= step;
-    } else {
-      element.scrollLeft += step;
-    }
-
-    scrollAmount += step;
-    if (scrollAmount >= distance) {
-      window.clearInterval(slideTimer);
-    }
-  }, speed);
-}
-
-function replace(val) {
-  let slug = val;
-  slug = slug.replace(/\s/g, "-");
-  return slug;
-}
-
-function getLink(val) {
-  let link = val.link;
-  let res = link.split("/");
-  res = res[res.length - 1];
-  return res;
-}
 export default {
   name: "app",
   components: {
@@ -205,31 +183,33 @@ export default {
     };
   },
   created() {
-    this.request();
-    const elem = document.querySelector(".latest");
-    console.log(elem.scrollLeft);
-    if (elem.scroll === null) {
-      document.querySelector(".scroll-left").style.visibility = "hidden";
-    }
+  	this.request();
   },
+
   methods: {
+		
     selectGenre(g) {
       const slug = replace(g);
       router.push("/genre/" + slug);
     },
+
     scrollLeft() {
       const elem = document.querySelector(".latest");
-
+      getScrollHeight();
       sideScroll(elem, "left", 20, 500, window.innerWidth - 400);
     },
+
     scrollRight() {
+      getScrollHeight();
       const elem = document.querySelector(".latest");
       sideScroll(elem, "right", 20, 500, window.innerWidth - 400);
     },
+
     displayManga(manga) {
       const res = getLink(manga);
       router.push("/manga/" + res);
     },
+		
     request() {
       const requestOne = axios.get(hotUrl);
       const requestTwo = axios.get(latestUrl);
@@ -305,33 +285,37 @@ h4 {
   font-weight: 800;
 }
 .body {
+	
   background: linear-gradient(rgba(0, 0, 0, 0.8) 100%, rgba(0, 0, 0, 0.8) 100%),
     url("../assets/bg.png");
   height: 500px;
 }
 .scroll-right {
   position: relative;
-  margin-right: -50px;
+  margin-right: 50px;
   top: -250px;
 }
 .scroll-left {
   position: absolute;
   top: 200px;
-  margin-left: -50px;
+  margin-left: 50px;
 }
 .arrow {
   transition: ease-in-out 0.5s;
-  height: 50px;
-  width: 50px;
+  height: 40px;
+  width: 40px;
 }
 .arrow:hover {
-  transform: ease scale(1.1);
-  -webkit-transform: scale(1.1);
-  -moz-transform: scale(1.1);
+  transform: scale(1.3);
+  -webkit-transform: scale(1.3);
+  -moz-transform: scale(1.3);
 }
 .button-scroll {
   border-radius: 50%;
+  background-color: black;
   cursor: pointer;
+  padding: 10px;
+  opacity: 0.7;
 }
 .genre-item {
   cursor: pointer;
@@ -369,7 +353,7 @@ span:hover {
 }
 
 .hot {
-  margin-top: 2rem;
+  margin-top: 5rem;
   margin-bottom: 2rem;
 }
 
@@ -400,7 +384,7 @@ span:hover {
   height: 5px;
   background-color: #f5f5f5;
   border-radius: 10px;
-	display:none;
+  display: none;
 }
 .latest::-webkit-scrollbar-track {
   -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);

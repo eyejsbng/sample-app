@@ -1,15 +1,16 @@
 <template>
   <div>
-    <div>
-      <div>
+    <div class="app-nav" v-if="currentRoute !== 'Genre'">
+    
         <div class="mx-auto pt-2 container row">
-          <div class="col-md-8">
+          <div class="col-2 align-selft-start">
             <router-link to="/" style="text-decoration: none;"
               ><h2 class="brand">MangaSub</h2></router-link
             >
           </div>
-          <div class="col-md-4">
-            <div class="input-group mb-3">
+					<div class="col-7"></div>
+          <div class="col-md-3">
+            <div class="float-right input-group mb-3">
               <input
                 type="text"
                 class="form-control"
@@ -17,17 +18,17 @@
                 placeholder="Search Manga ex. 'Naruto'"
                 @keypress.enter="search"
               />
-              <!-- <button class="btn btn-primary" type="button" @click="search">
-              Search
-            </button> -->
+            
             </div>
           </div>
-        </div>
+     
       </div>
     </div>
+	
     <keep-alive>
       <router-view></router-view>
     </keep-alive>
+
   </div>
 </template>
 
@@ -37,10 +38,12 @@ export default {
   data() {
     return {
       keyword: "",
-      router: ""
+      currentRoute: ""
     };
   },
-  created() {},
+  created() {
+		this.currentRoute = router.currentRoute.name;
+	},
   methods: {
     search() {
       if (
@@ -53,13 +56,14 @@ export default {
   },
   watch: {
     $route() {
-      this.router = router.currentRoute.name;
+      this.currentRoute = router.currentRoute.name;
     }
   }
 };
 </script>
 
 <style scoped>
+
 .brand {
   color: #bb25e8;
   font-weight: 800;
@@ -67,13 +71,6 @@ export default {
 .form-control {
   border-radius: 20px;
 }
-.nav-bar {
-  opacity: 0.5;
-}
-.sticky-top {
-  opacity: 0.9;
-}
-
 .brand:hover {
   color: #f7f7f7;
   text-shadow: 2px 2px #bb25e8;

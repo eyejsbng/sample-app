@@ -1,6 +1,7 @@
 <template>
+	<div class="body">
   <div class="mx-auto container">
-    <div class="row ">
+    <div class="row">
       <div class="col-md-12 genre-title">
         <h3>Genre / {{ genre }}</h3>
       </div>
@@ -27,11 +28,15 @@
       <infinite-loading @infinite="loadMore"></infinite-loading>
     </div>
   </div>
+	</div>
 </template>
 <script>
 import router from "../router";
 import axios from "axios";
 import InfiniteLoading from "vue-infinite-loading";
+
+const  url = "https://warm-refuge-03594.herokuapp.com/api/manga/genre/";
+
 export default {
   components: {
     InfiniteLoading
@@ -41,7 +46,7 @@ export default {
       genre: "",
       page: 1,
       mangas: [],
-      url: "https://warm-refuge-03594.herokuapp.com/api/manga/genre/"
+     
     };
   },
   created() {
@@ -49,7 +54,7 @@ export default {
   },
   methods: {
     fetchData() {
-      axios.get(this.url + this.genre + "/" + this.page).then(resp => {
+      axios.get(`${url}${this.genre}/${this.page}`).then(resp => {
         this.mangas = resp.data.data;
         this.page += 1;
       });
@@ -61,7 +66,7 @@ export default {
       router.push("/manga/" + res);
     },
     loadMore($state) {
-      axios.get(this.url + this.genre + "/" + this.page).then(resp => {
+      axios.get(`${url}${this.genre}/${this.page}`).then(resp => {
         const data = resp.data.data;
         if (data.length) {
           this.mangas = this.mangas.concat(data);
@@ -76,13 +81,23 @@ export default {
   watch: {
     $route() {
       this.page = 1;
-      this.genre = router.currentRoute.params.genre;
       this.fetchData();
     }
   }
 };
 </script>
 <style scoped>
+
+.body {
+  background: linear-gradient(rgba(0, 0, 0, 0.8) 100%, rgba(0, 0, 0, 0.8) 100%),
+    url("../assets/bg.png");
+	background-attachment: fixed;
+	
+}
+.container {
+	 background: linear-gradient(rgba(0, 0, 0, 0.8) 100%, rgba(0, 0, 0, 0.5) 100%);
+	
+}
 .sticky-top {
   top: 5em;
 }
